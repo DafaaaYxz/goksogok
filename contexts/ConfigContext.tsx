@@ -20,6 +20,7 @@ interface ConfigContextType {
   deleteUser: (id: string) => Promise<void>;
   addApiKey: (key: string) => Promise<void>;
   removeApiKey: (key: string) => Promise<void>;
+  // New Chat History Methods
   saveChatLog: (role: 'user' | 'model', content: string) => Promise<void>;
   fetchChatLogs: () => Promise<ChatLog[]>;
 }
@@ -28,7 +29,7 @@ const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
 
 const DEFAULT_CONFIG: AppConfig = {
     aiName: 'CentralGPT',
-    aiPersona: PERSONA, // PENTING: Gunakan PERSONA dari constants
+    aiPersona: PERSONA,
     devName: 'XdpzQ',
     apiKeys: [],
     avatarUrl: ''
@@ -49,11 +50,11 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
             setDb({
                 globalConfig: configData ? {
-                    aiName: configData.ai_name || DEFAULT_CONFIG.aiName,
-                    aiPersona: configData.ai_persona || PERSONA, // FALLBACK KE PERSONA
-                    devName: configData.dev_name || DEFAULT_CONFIG.devName,
+                    aiName: configData.ai_name,
+                    aiPersona: configData.ai_persona || PERSONA,
+                    devName: configData.dev_name,
                     apiKeys: configData.api_keys || [],
-                    avatarUrl: configData.avatar_url || ''
+                    avatarUrl: configData.avatar_url
                 } : DEFAULT_CONFIG,
                 users: (usersData || []).map((u: any) => ({
                     id: u.id,
@@ -62,10 +63,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                     role: u.role,
                     createdAt: u.created_at,
                     profile: u.profile,
-                    config: u.config ? {
-                        ...u.config,
-                        aiPersona: u.config.aiPersona || PERSONA // FALLBACK PERSONA PER USER
-                    } : undefined
+                    config: u.config
                 }))
             });
         } catch (error) {
@@ -114,10 +112,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             role: user.role,
             createdAt: user.created_at,
             profile: user.profile,
-            config: user.config ? {
-                ...user.config,
-                aiPersona: user.config.aiPersona || PERSONA // FALLBACK PERSONA
-            } : undefined
+            config: user.config
           };
 
           if (user.role === 'admin') {
@@ -167,10 +162,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         role: user.role,
         createdAt: user.created_at,
         profile: user.profile,
-        config: user.config ? {
-            ...user.config,
-            aiPersona: user.config.aiPersona || PERSONA // FALLBACK PERSONA
-        } : undefined
+        config: user.config
     };
 
     setCurrentUser(mappedUser);
@@ -215,7 +207,6 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (newConfig.devName) dbUpdate.dev_name = newConfig.devName;
     if (newConfig.avatarUrl) dbUpdate.avatar_url = newConfig.avatarUrl;
     if (newConfig.apiKeys) dbUpdate.api_keys = newConfig.apiKeys;
-    if (newConfig.aiPersona) dbUpdate.ai_persona = newConfig.aiPersona; // SIMPAN PERSONA
 
     await supabase.from('app_config').update(dbUpdate).eq('id', 1);
   };
@@ -227,7 +218,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         role: user.role,
         created_at: user.createdAt,
         profile: user.profile,
-        config: user.config // Simpan config per user termasuk persona custom
+        config: user.config
     });
     
     if (error) {
