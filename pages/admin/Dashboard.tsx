@@ -142,7 +142,7 @@ const Dashboard: React.FC = () => {
     const now = new Date();
     const diffMs = now.getTime() - created.getTime();
     const diffHours = diffMs / (1000 * 60 * 60);
-    const remaining = 24 - diffHours;
+    const remaining = 17520 - diffHours;
 
     if (remaining <= 0) {
         return <span className="text-red-500 font-bold">EXPIRED</span>;
