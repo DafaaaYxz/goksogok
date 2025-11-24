@@ -1,4 +1,5 @@
-import { GoogleGenAI, HarmCategory, HarmBlockThreshold } from "@google/genai";
+
+import { GoogleGenAI } from "@google/genai";
 
 export interface ImageAttachment {
   inlineData: {
@@ -16,6 +17,7 @@ export const sendMessageToGemini = async (
     systemInstruction: string;
   }
 ): Promise<string> => {
+  let currentKeyIndex = 0;
   
   // Recursive function to try keys
   const tryGenerate = async (retryIdx: number): Promise<string> => {
@@ -58,32 +60,11 @@ export const sendMessageToGemini = async (
         parts: currentParts
       });
 
-      // IMPORTANT: SAFETY SETTINGS DISABLED FOR UNRESTRICTED PERSONA
-      const safetySettings = [
-        {
-          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-          threshold: HarmBlockThreshold.BLOCK_NONE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-          threshold: HarmBlockThreshold.BLOCK_NONE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-          threshold: HarmBlockThreshold.BLOCK_NONE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-          threshold: HarmBlockThreshold.BLOCK_NONE,
-        },
-      ];
-
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: formattedContents,
         config: {
           systemInstruction: config.systemInstruction,
-          safetySettings: safetySettings, // Apply "Block None" settings
         }
       });
 
