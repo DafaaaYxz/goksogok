@@ -35,6 +35,11 @@ const DEFAULT_CONFIG: AppConfig = {
     avatarUrl: ''
 };
 
+// Konstanta untuk konversi waktu
+const HOURS_IN_DAY = 24;
+const DAYS_IN_YEAR = 365;
+const HOURS_IN_TWO_YEARS = 2 * DAYS_IN_YEAR * HOURS_IN_DAY; // 17.520 jam
+
 export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [db, setDb] = useState<DatabaseSchema>({ users: [], globalConfig: DEFAULT_CONFIG });
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -88,7 +93,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
   }, []);
 
-  // 2. Persistent Session Logic
+  // 2. Persistent Session Logic - Menggunakan 17.520 jam (2 tahun)
   useEffect(() => {
       const restoreSession = async () => {
           const savedSessionKey = localStorage.getItem('central_gpt_active_session');
@@ -118,13 +123,13 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           if (user.role === 'admin') {
               setCurrentUser(mappedUser);
           } else {
-              // 24 Hour Check
+              // 17.520 Jam Check (2 tahun)
               const now = new Date();
               const created = new Date(user.created_at);
               const diffMs = now.getTime() - created.getTime();
               const diffHours = diffMs / (1000 * 60 * 60);
 
-              if (diffHours < 24) {
+              if (diffHours < HOURS_IN_TWO_YEARS) {
                   setCurrentUser(mappedUser);
               } else {
                   localStorage.removeItem('central_gpt_active_session');
@@ -151,8 +156,8 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const diffMs = now.getTime() - created.getTime();
     const diffHours = diffMs / (1000 * 60 * 60);
 
-    if (diffHours >= 24) {
-      return { success: false, message: 'Access Key has expired (24h limit reached).' };
+    if (diffHours >= HOURS_IN_TWO_YEARS) {
+      return { success: false, message: `Access Key has expired (${HOURS_IN_TWO_YEARS.toLocaleString()} hour limit reached).` };
     }
 
     const mappedUser: User = {
