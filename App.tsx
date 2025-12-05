@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import LoadingScreen from './components/LoadingScreen'; 
 import { ConfigProvider, useConfig } from './contexts/ConfigContext';
 
 // Pages
@@ -18,19 +17,10 @@ import UserDashboard from './pages/UserDashboard';
 
 const AppContent: React.FC = () => {
   const { currentUser } = useConfig();
-  const [isLoading, setIsLoading] = useState(true);
-
-  if (isLoading) {
-    return <LoadingScreen onComplete={() => setIsLoading(false)} />;
-  }
   
   return (
-    <div className="min-h-screen bg-black text-gray-200 selection:bg-red-900 selection:text-white flex flex-col font-sans animate-fade-in">
-      <div className="fixed inset-0 pointer-events-none z-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-red-900/10 via-black to-black opacity-50"></div>
-      <div className="fixed inset-0 pointer-events-none z-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
-      
+    <div className="min-h-screen bg-gray-900 text-white">
       <Navbar />
-      
       <main className="flex-grow relative z-10">
         <Routes>
           <Route path="/" element={<HomePage />} />
