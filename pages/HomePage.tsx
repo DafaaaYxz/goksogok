@@ -9,7 +9,7 @@ const HomePage: React.FC = () => {
         <section className="py-20 text-center">
           <div className="max-w-4xl mx-auto px-4">
             <h1 className="text-5xl font-extrabold tracking-tight text-blue-400 sm:text-6xl md:text-7xl">
-              Welcome to goksogok VX
+              Welcome to CentralGPT VX
             </h1>
             <p className="mt-6 text-xl text-gray-300">
               Your intelligent assistant for crafting amazing applications.
