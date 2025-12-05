@@ -8,11 +8,13 @@ import { ConfigProvider, useConfig } from './contexts/ConfigContext';
 // Pages
 import HomePage from './pages/HomePage';
 import TerminalPage from './pages/TerminalPage';
+import ImageGenPage from './pages/ImageGenPage';
+import VoiceChatPage from './pages/VoiceChatPage';
 import DatabasePage from './pages/DatabasePage';
 import AboutPage from './pages/AboutPage';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/admin/Dashboard';
-import UserDashboard from './pages/UserDashboard'; // New Page
+import UserDashboard from './pages/UserDashboard';
 
 const AppContent: React.FC = () => {
   const { currentUser } = useConfig();
@@ -36,9 +38,10 @@ const AppContent: React.FC = () => {
           <Route path="/login" element={<LoginPage />} />
           
           {/* User Routes */}
-          {/* Redirect to Dashboard first after login logic usually happens in LoginPage, but here we protect the route */}
           <Route path="/dashboard" element={currentUser ? <UserDashboard /> : <Navigate to="/login" />} />
           <Route path="/terminal" element={currentUser ? <TerminalPage /> : <Navigate to="/login" />} />
+          <Route path="/image-gen" element={currentUser ? <ImageGenPage /> : <Navigate to="/login" />} />
+          <Route path="/voice-chat" element={currentUser ? <VoiceChatPage /> : <Navigate to="/login" />} />
           <Route path="/database" element={currentUser ? <DatabasePage /> : <Navigate to="/login" />} />
           
           <Route path="/admin/login" element={<Navigate to="/login" replace />} />
@@ -53,8 +56,8 @@ const AppContent: React.FC = () => {
 
       {currentUser && (
         <div className="fixed bottom-8 right-8 z-50">
-          <a href="#/terminal" className="w-14 h-14 bg-red-700 rounded-full border-2 border-white shadow-[0_0_15px_rgba(255,0,0,0.5)] flex items-center justify-center hover:scale-110 hover:rotate-90 transition-all duration-300 group text-white no-underline">
-            <i className="fa-solid fa-terminal text-white text-xl"></i>
+          <a href="#/image-gen" className="w-14 h-14 bg-blue-600 rounded-full border-2 border-white shadow-[0_0_15px_rgba(0,0,255,0.5)] flex items-center justify-center hover:scale-110 transition-all duration-300 group text-white no-underline">
+            <i className="fa-solid fa-image text-white text-xl"></i>
           </a>
         </div>
       )}

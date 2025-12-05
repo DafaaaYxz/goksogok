@@ -86,3 +86,47 @@ export const sendMessageToGemini = async (
 
   return tryGenerate(0);
 };
+
+export const generateImage = async (
+  prompt: string,
+  config: {
+    apiKeys: string[];
+  }
+): Promise<string> => {
+  const tryGenerate = async (retryIdx: number): Promise<string> => {
+    if (retryIdx >= config.apiKeys.length) {
+      throw new Error("All API keys exhausted. Please update keys in Admin Dashboard.");
+    }
+
+    try {
+      const apiKey = config.apiKeys[retryIdx];
+      const ai = new GoogleGenAI({ apiKey });
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-1.5-flash-latest',
+        contents: [{
+          role: 'user',
+          parts: [{ text: prompt }],
+        }],
+        config: {
+          responseMimeType: 'image/png',
+        }
+      });
+
+      if (response.inlineData) {
+        return `data:image/png;base64,${response.inlineData.data}`;
+      }
+
+      throw new Error("Empty response or no image data");
+
+    } catch (error: any) {
+      console.warn(`Key at index ${retryIdx} failed:`, error.message);
+      if (error.toString().includes("429") || error.toString().includes("403") || error.toString().includes("400")) {
+         return tryGenerate(retryIdx + 1);
+      }
+      throw error;
+    }
+  };
+
+  return tryGenerate(0);
+};
