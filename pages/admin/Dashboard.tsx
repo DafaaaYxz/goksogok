@@ -259,25 +259,31 @@ const Dashboard: React.FC = () => {
           {activeTab === 'keys' && (
             <div>
               <h3 className="text-xl text-white font-bold mb-6 border-l-4 border-red-600 pl-3">GLOBAL API MANAGER</h3>
-              <div className="flex gap-2 mb-8">
-                <input 
-                  value={newKey}
-                  onChange={e => setNewKey(e.target.value)}
-                  placeholder="Paste new Google GenAI API Key..."
-                  className="flex-1 bg-black border border-gray-700 p-3 rounded focus:border-red-500 outline-none text-white"
-                  disabled={isAddingKey}
-                />
-                <button onClick={handleAddKey} disabled={isAddingKey} className="bg-green-700 text-white px-6 font-bold rounded">
-                  {isAddingKey ? 'ADDING...' : 'ADD KEY'}
-                </button>
-              </div>
-              <div className="grid gap-3">
-                {db.globalConfig.apiKeys.map((key, idx) => (
-                  <div key={idx} className="flex items-center justify-between bg-black p-4 border border-gray-800 rounded">
-                    <span className="font-mono text-sm text-gray-300">{key.substring(0, 12)}...</span>
-                    <button onClick={() => removeApiKey(key)} className="text-red-500">REMOVE</button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="text-lg text-white font-bold mb-4">Google GenAI Keys</h4>
+                  <div className="flex gap-2 mb-4">
+                    <input
+                      value={newKey}
+                      onChange={e => setNewKey(e.target.value)}
+                      placeholder="Paste new Google GenAI API Key..."
+                      className="flex-1 bg-black border border-gray-700 p-3 rounded focus:border-red-500 outline-none text-white"
+                      disabled={isAddingKey}
+                    />
+                    <button onClick={handleAddKey} disabled={isAddingKey} className="bg-green-700 text-white px-6 font-bold rounded">
+                      {isAddingKey ? 'ADDING...' : 'ADD KEY'}
+                    </button>
                   </div>
-                ))}
+                  <div className="grid gap-3">
+                {(db.globalConfig.apiKeys.gemini || []).map((key, idx) => (
+                      <div key={idx} className="flex items-center justify-between bg-black p-4 border border-gray-800 rounded">
+                        <span className="font-mono text-sm text-gray-300">{key.substring(0, 12)}...</span>
+                    <button onClick={() => removeApiKey(key, 'gemini')} className="text-red-500">REMOVE</button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Add other API key sections here, e.g., for voice, image generation, etc. */}
               </div>
             </div>
           )}

@@ -31,7 +31,9 @@ const DEFAULT_CONFIG: AppConfig = {
     aiName: 'CentralGPT',
     aiPersona: PERSONA,
     devName: 'XdpzQ',
-    apiKeys: [],
+    apiKeys: {
+        gemini: []
+    },
     avatarUrl: ''
 };
 
@@ -58,7 +60,7 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                     aiName: configData.ai_name,
                     aiPersona: configData.ai_persona || PERSONA,
                     devName: configData.dev_name,
-                    apiKeys: configData.api_keys || [],
+                    apiKeys: configData.api_keys || { gemini: [] },
                     avatarUrl: configData.avatar_url
                 } : DEFAULT_CONFIG,
                 users: (usersData || []).map((u: any) => ({
@@ -235,17 +237,17 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     await supabase.from('users').delete().eq('id', id);
   };
 
-  const addApiKey = async (key: string) => {
-    const currentKeys = db.globalConfig.apiKeys;
+  const addApiKey = async (key: string, type: 'gemini' = 'gemini') => {
+    const currentKeys = db.globalConfig.apiKeys[type] || [];
     await supabase.from('app_config').update({
-        api_keys: [...currentKeys, key]
+        api_keys: { ...db.globalConfig.apiKeys, [type]: [...currentKeys, key] }
     }).eq('id', 1);
   };
 
-  const removeApiKey = async (keyToRemove: string) => {
-    const currentKeys = db.globalConfig.apiKeys;
+  const removeApiKey = async (keyToRemove: string, type: 'gemini' = 'gemini') => {
+    const currentKeys = db.globalConfig.apiKeys[type] || [];
     await supabase.from('app_config').update({
-        api_keys: currentKeys.filter(k => k !== keyToRemove)
+        api_keys: { ...db.globalConfig.apiKeys, [type]: currentKeys.filter(k => k !== keyToRemove) }
     }).eq('id', 1);
   };
 

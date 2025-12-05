@@ -7,8 +7,7 @@ const Navbar: React.FC = () => {
   const { currentUser, logout, isAdmin, db } = useConfig();
   const navigate = useNavigate();
 
-  // Dynamic Header Logic: Use currentUser username if logged in, otherwise default
-  const headerTitle = currentUser ? currentUser.username.toUpperCase() : db.globalConfig.aiName;
+  const headerTitle = currentUser ? currentUser.username.toUpperCase() : (db?.globalConfig?.aiName || 'goksogok');
   const version = "VX";
 
   const handleLogout = () => {
@@ -18,8 +17,10 @@ const Navbar: React.FC = () => {
 
   const navItems = [
     { name: 'Home', path: '/', public: true },
-    { name: 'Dashboard', path: '/dashboard', public: false }, // User Dashboard
+    { name: 'Dashboard', path: '/dashboard', public: false },
     { name: 'Terminal', path: '/terminal', public: false },
+    { name: 'Image Gen', path: '/image-gen', public: false },
+    { name: 'Voice Chat', path: '/voice-chat', public: false },
     { name: 'About', path: '/about', public: true }
   ].filter(item => item.public || currentUser);
 
@@ -27,7 +28,6 @@ const Navbar: React.FC = () => {
     <nav className="sticky top-0 z-50 border-b-2 border-red-900 bg-black/90 backdrop-blur-md shadow-[0_4px_20px_rgba(139,0,0,0.5)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Dynamic Logo */}
           <NavLink to="/" className="flex items-center gap-2 group">
             <i className="fa-solid fa-biohazard text-red-600 text-2xl animate-pulse group-hover:rotate-180 transition-transform duration-700"></i>
             <span className="text-white font-['Press_Start_2P'] text-sm md:text-lg tracking-tighter">
@@ -35,7 +35,6 @@ const Navbar: React.FC = () => {
             </span>
           </NavLink>
 
-          {/* Desktop Links */}
           <div className="hidden md:flex items-center">
             <div className="ml-10 flex items-baseline space-x-6">
               {navItems.map((item) => (
@@ -56,7 +55,6 @@ const Navbar: React.FC = () => {
               ))}
             </div>
 
-            {/* Auth Buttons */}
             <div className="ml-8 flex items-center gap-3">
               {currentUser ? (
                 <>
@@ -86,7 +84,6 @@ const Navbar: React.FC = () => {
             </div>
           </div>
 
-          {/* Mobile Menu Button */}
           <div className="-mr-2 flex md:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -98,7 +95,6 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="md:hidden bg-black border-b border-red-900 absolute w-full animate-slide-down shadow-xl z-50">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">

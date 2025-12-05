@@ -29,7 +29,10 @@ export interface AppConfig {
   aiName: string;
   aiPersona: string;
   devName: string;
-  apiKeys: string[];
+    apiKeys: {
+        gemini?: string[];
+        // Add other API key types here
+    };
   avatarUrl?: string; // Base64 string for the avatar
 }
 

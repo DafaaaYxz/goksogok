@@ -12,18 +12,20 @@ export const sendMessageToGemini = async (
   images: ImageAttachment[],
   history: { role: string; parts: { text: string }[] }[],
   config: {
-    apiKeys: string[];
+    apiKeys: { gemini?: string[] };
     systemInstruction: string;
   }
 ): Promise<string> => {
   
+  const geminiKeys = config.apiKeys.gemini || [];
+
   const tryGenerate = async (retryIdx: number): Promise<string> => {
-    if (retryIdx >= config.apiKeys.length) {
+    if (retryIdx >= geminiKeys.length) {
       throw new Error("All API keys exhausted. Please update keys in Admin Dashboard.");
     }
 
     try {
-      const apiKey = config.apiKeys[retryIdx];
+      const apiKey = geminiKeys[retryIdx];
       const ai = new GoogleGenAI({ apiKey });
 
       const formattedContents = history.map(msg => ({
@@ -78,6 +80,51 @@ export const sendMessageToGemini = async (
     } catch (error: any) {
       console.warn(`Key at index ${retryIdx} failed:`, error.message);
       if (error.toString().includes("429") || error.toString().includes("403") || error.toString().includes("400") || error.toString().includes("SAFETY")) {
+         return tryGenerate(retryIdx + 1);
+      }
+      throw error;
+    }
+  };
+
+  return tryGenerate(0);
+};
+
+export const generateImage = async (
+  prompt: string,
+  config: {
+    apiKeys: { gemini?: string[] };
+  }
+): Promise<string> => {
+  const geminiKeys = config.apiKeys.gemini || [];
+  const tryGenerate = async (retryIdx: number): Promise<string> => {
+    if (retryIdx >= geminiKeys.length) {
+      throw new Error("All API keys exhausted. Please update keys in Admin Dashboard.");
+    }
+
+    try {
+      const apiKey = geminiKeys[retryIdx];
+      const ai = new GoogleGenAI({ apiKey });
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-1.5-flash-latest',
+        contents: [{
+          role: 'user',
+          parts: [{ text: prompt }],
+        }],
+        config: {
+          responseMimeType: 'image/png',
+        }
+      });
+
+      if (response.inlineData) {
+        return `data:image/png;base64,${response.inlineData.data}`;
+      }
+
+      throw new Error("Empty response or no image data");
+
+    } catch (error: any) {
+      console.warn(`Key at index ${retryIdx} failed:`, error.message);
+      if (error.toString().includes("429") || error.toString().includes("403") || error.toString().includes("400")) {
          return tryGenerate(retryIdx + 1);
       }
       throw error;
